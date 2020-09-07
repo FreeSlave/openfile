@@ -1,0 +1,12 @@
+{
+    "authors": [
+        "Roman Chistokhodov"
+    ],
+    "copyright": "Copyright © 2020, Roman Chistokhodov",
+    "description": "Opening std.stdio.File using a set of symbolic constants as a file access mode",
+    "license": "BSL-1.0",
+    "name": "openfile",
+    "targetName" : "openfile",
+    "targetPath" : "lib",
+    "targetType" : "library"
+}
