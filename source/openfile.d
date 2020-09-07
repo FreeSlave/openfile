@@ -8,7 +8,7 @@
  *  $(LINK2 http://www.boost.org/LICENSE_1_0.txt, Boost License 1.0).
  */
 
-import std.stdio : File;
+public import std.stdio : File;
 
 /// Flags for file open mode.
 enum OpenMode
@@ -175,13 +175,13 @@ private:
             else
                 creationDisposition = OPEN_EXISTING;
         }
-        else if (openMode & OpenMode.truncate)
-        {
-            creationDisposition = CREATE_ALWAYS;
-        }
         else if (openMode & OpenMode.createNew)
         {
             creationDisposition = CREATE_NEW;
+        }
+		else if (openMode & OpenMode.truncate)
+        {
+            creationDisposition = CREATE_ALWAYS;
         }
         else if (anyWrite)
         {
@@ -283,6 +283,8 @@ unittest
     auto deleteme2 = buildPath(std.file.tempDir(), "deleteme2.openfile.unittest.pid" ~ to!string(thisProcessID));
     scope(exit) std.file.remove(deleteme2);
 
+	assertThrown(f.sopen(deleteme2, OpenMode.truncate | OpenMode.existingOnly));
+
     f.sopen(deleteme2, OpenMode.read | OpenMode.update | OpenMode.createNew);
     f.write("baz");
     f.rewind();
@@ -291,6 +293,11 @@ unittest
     f.write("bar");
     f.rewind();
     assert(f.readln() == "bazbar");
+
+	f.sopen(deleteme2, OpenMode.read | OpenMode.truncate | OpenMode.existingOnly);
+	f.write("some");
+	f.rewind();
+	assert(f.readln() == "some");
 
     f.close();
 }
