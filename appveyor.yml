@@ -87,4 +87,3 @@ test_script:
  - '%DC% --version'
  - dub test --arch=%Darch% --compiler=%DC%
  - dub build --arch=%Darch% --compiler=%DC%
- - dub --single examples/list.d --arch=%Darch% --compiler=%DC%
