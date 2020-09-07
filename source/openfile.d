@@ -141,7 +141,8 @@ private:
 
     HANDLE openHandle(string name, OpenMode openMode) @trusted
     {
-        import std.internal.cstring : tempCString;
+        import std.utf : toUTF16z;
+		import std.windows.syserror : wenforce;
         import core.sys.windows.core : FILE_ATTRIBUTE_NORMAL, FILE_FLAG_SEQUENTIAL_SCAN,
                                         GENERIC_READ, GENERIC_WRITE, FILE_SHARE_READ,
                                         TRUNCATE_EXISTING, OPEN_EXISTING, CREATE_ALWAYS,
@@ -149,7 +150,7 @@ private:
                                         FILE_END, INVALID_SET_FILE_POINTER, DWORD,
                                         CreateFileW, SetFilePointer;
 
-        auto namez = name.tempCString!FSChar();
+        auto namez = name.toUTF16z;
         const bool anyWrite = hasAnyWriteFlag(openMode);
         const bool existing = (openMode & OpenMode.existingOnly) != 0;
         const bool hasRead = (openMode & OpenMode.read) != 0;
@@ -195,7 +196,7 @@ private:
 }
 
 /**
- * Open file using name and access mode.
+ * Open file using name and symbolic access mode.
  */
 File openFile(string name, OpenMode mode) @trusted
 {
@@ -225,6 +226,13 @@ File openFile(string name, OpenMode mode) @trusted
     }
 }
 
+/// Open file using name and symbolic access mode. Convenient function for UFCS. Calls $(B std.stdio.detach) before assigning a new file handle.
+void sopen(ref scope File file, string name, OpenMode mode) @safe
+{
+	file.detach();
+	file = openFile(name, mode);
+}
+
 ///
 unittest
 {
@@ -237,7 +245,6 @@ unittest
     auto deleteme = buildPath(std.file.tempDir(), "deleteme.openfile.unittest.pid" ~ to!string(thisProcessID));
     scope(exit) std.file.remove(deleteme);
 
-    File f;
     // bad set of flags
     assertThrown(openFile(deleteme, OpenMode.createNew | OpenMode.existingOnly));
     assertThrown(openFile(deleteme, OpenMode.existingOnly));
@@ -246,29 +253,29 @@ unittest
     assertThrown(openFile(deleteme, OpenMode.read));
     assertThrown(openFile(deleteme, OpenMode.update | OpenMode.existingOnly));
 
-    f = openFile(deleteme, OpenMode.read | OpenMode.truncate | OpenMode.createNew);
+    File f = openFile(deleteme, OpenMode.read | OpenMode.truncate | OpenMode.createNew);
     f.write("Hello");
     f.rewind();
     assert(f.readln() == "Hello");
 
     assertThrown(openFile(deleteme, OpenMode.createNew));
 
-    f = openFile(deleteme, OpenMode.append | OpenMode.existingOnly);
+    f.sopen(deleteme, OpenMode.append | OpenMode.existingOnly);
     f.write(" world");
 
-    f = openFile(deleteme, OpenMode.update | OpenMode.existingOnly);
+    f.sopen(deleteme, OpenMode.update | OpenMode.existingOnly);
     f.seek(6);
     f.write("sco");
 
-    f = openFile(deleteme, OpenMode.read);
+    f.sopen(deleteme, OpenMode.read);
     assert(f.readln() == "Hello scold");
 
-    f = openFile(deleteme, OpenMode.read | OpenMode.update | OpenMode.existingOnly);
+    f.sopen(deleteme, OpenMode.read | OpenMode.update | OpenMode.existingOnly);
     f.write("Yo");
     f.rewind();
     assert(f.readln() == "Yollo scold");
 
-    f = openFile(deleteme, OpenMode.read | OpenMode.append | OpenMode.existingOnly);
+    f.sopen(deleteme, OpenMode.read | OpenMode.append | OpenMode.existingOnly);
     f.write("ing");
     f.rewind();
     assert(f.readln() == "Yollo scolding");
@@ -276,7 +283,7 @@ unittest
     auto deleteme2 = buildPath(std.file.tempDir(), "deleteme2.openfile.unittest.pid" ~ to!string(thisProcessID));
     scope(exit) std.file.remove(deleteme2);
 
-    f = openFile(deleteme2, OpenMode.read | OpenMode.update | OpenMode.createNew);
+    f.sopen(deleteme2, OpenMode.read | OpenMode.update | OpenMode.createNew);
     f.write("baz");
     f.rewind();
     assert(f.readln() == "baz");
