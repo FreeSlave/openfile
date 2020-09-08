@@ -8,6 +8,8 @@
  *  $(LINK2 http://www.boost.org/LICENSE_1_0.txt, Boost License 1.0).
  */
 
+module openfile;
+
 public import std.stdio : File;
 
 /// Flags for file open mode.
@@ -197,6 +199,7 @@ private:
 
 /**
  * Open file using name and symbolic access mode.
+ * See_Also: $(D openfile.sopen)
  */
 File openFile(string name, OpenMode mode) @trusted
 {
