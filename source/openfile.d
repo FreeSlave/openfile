@@ -144,7 +144,7 @@ private:
     HANDLE openHandle(string name, OpenMode openMode) @trusted
     {
         import std.utf : toUTF16z;
-		import std.windows.syserror : wenforce;
+        import std.windows.syserror : wenforce;
         import core.sys.windows.core : FILE_ATTRIBUTE_NORMAL, FILE_FLAG_SEQUENTIAL_SCAN,
                                         GENERIC_READ, GENERIC_WRITE, FILE_SHARE_READ, FILE_SHARE_WRITE,
                                         TRUNCATE_EXISTING, OPEN_EXISTING, CREATE_ALWAYS,
@@ -184,7 +184,7 @@ private:
         {
             creationDisposition = CREATE_NEW;
         }
-		else if (openMode & OpenMode.truncate)
+        else if (openMode & OpenMode.truncate)
         {
             creationDisposition = CREATE_ALWAYS;
         }
@@ -235,8 +235,8 @@ File openFile(string name, OpenMode mode) @trusted
 /// Open file using name and symbolic access mode. Convenient function for UFCS. Calls $(B std.stdio.detach) before assigning a new file handle.
 void sopen(ref scope File file, string name, OpenMode mode) @safe
 {
-	file.detach();
-	file = openFile(name, mode);
+    file.detach();
+    file = openFile(name, mode);
 }
 
 ///
@@ -289,7 +289,7 @@ unittest
     auto deleteme2 = buildPath(std.file.tempDir(), "deleteme2.openfile.unittest.pid" ~ to!string(thisProcessID));
     scope(exit) std.file.remove(deleteme2);
 
-	assertThrown(f.sopen(deleteme2, OpenMode.truncate | OpenMode.existingOnly));
+    assertThrown(f.sopen(deleteme2, OpenMode.truncate | OpenMode.existingOnly));
 
     f.sopen(deleteme2, OpenMode.read | OpenMode.update | OpenMode.createNew);
     f.write("baz");
@@ -300,10 +300,10 @@ unittest
     f.rewind();
     assert(f.readln() == "bazbar");
 
-	f.sopen(deleteme2, OpenMode.read | OpenMode.truncate | OpenMode.existingOnly);
-	f.write("some");
-	f.rewind();
-	assert(f.readln() == "some");
+    f.sopen(deleteme2, OpenMode.read | OpenMode.truncate | OpenMode.existingOnly);
+    f.write("some");
+    f.rewind();
+    assert(f.readln() == "some");
 
     f.close();
 }
