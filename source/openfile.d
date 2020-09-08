@@ -146,7 +146,7 @@ private:
         import std.utf : toUTF16z;
 		import std.windows.syserror : wenforce;
         import core.sys.windows.core : FILE_ATTRIBUTE_NORMAL, FILE_FLAG_SEQUENTIAL_SCAN,
-                                        GENERIC_READ, GENERIC_WRITE, FILE_SHARE_READ,
+                                        GENERIC_READ, GENERIC_WRITE, FILE_SHARE_READ, FILE_SHARE_WRITE,
                                         TRUNCATE_EXISTING, OPEN_EXISTING, CREATE_ALWAYS,
                                         CREATE_NEW, OPEN_ALWAYS, INVALID_HANDLE_VALUE,
                                         FILE_END, INVALID_SET_FILE_POINTER, DWORD,
@@ -163,12 +163,15 @@ private:
         DWORD flags = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN;
 
         if (hasRead)
+        {
             desiredAccess |= GENERIC_READ;
-        if (anyWrite)
-            desiredAccess |= GENERIC_WRITE;
-
-        if (hasRead && !anyWrite)
             shareMode |= FILE_SHARE_READ;
+        }
+        if (anyWrite)
+        {
+            desiredAccess |= GENERIC_WRITE;
+            shareMode |= FILE_SHARE_WRITE;
+        }
 
         if ((hasRead && !anyWrite) || existing)
         {
