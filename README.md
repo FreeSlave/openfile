@@ -1,6 +1,6 @@
 # OpenFile
 
-[![Build Status](https://travis-ci.org/FreeSlave/openfile.svg?branch=master)](https://travis-ci.org/FreeSlave/openfile)
+[![Build Status](https://github.com/FreeSlave/openfile/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/FreeSlave/openfile/actions/workflows/ci.yml)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/FreeSlave/openfile?branch=master&svg=true)](https://ci.appveyor.com/project/FreeSlave/openfile)
 [![Coverage Status](https://coveralls.io/repos/FreeSlave/openfile/badge.svg?branch=master&service=github)](https://coveralls.io/github/FreeSlave/openfile?branch=master)
 
